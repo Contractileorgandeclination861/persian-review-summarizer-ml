@@ -60,16 +60,29 @@ def main() -> None:
     print(f"\n⏳ در حال تحلیل {len(reviews)} نظر با موتور «{args.method}»…\n")
     result = analyzer.analyze(reviews)
 
-    print("=" * 60)
+    s = result.sentiment
+    stars = "★" * round(result.rating) + "☆" * (5 - round(result.rating))
+
+    print("═" * 62)
     print("📌 خلاصه‌ی نظرات:")
     print(f"   {result.summary}")
-    print("-" * 60)
-    s = result.sentiment
+    print("─" * 62)
+    print(f"⭐ امتیاز تخمینی: {stars}  ({result.rating} از ۵)")
     print(
         f"📊 احساسات: مثبت={s.positive} | منفی={s.negative} | خنثی={s.neutral}"
         f"  →  {s.label}"
     )
-    print("=" * 60)
+    if result.keywords:
+        print(f"🏷️  کلیدواژه‌ها: {'، '.join(result.keywords)}")
+    if result.pros:
+        print("✅ نکات مثبت:")
+        for p in result.pros:
+            print(f"   + {p}")
+    if result.cons:
+        print("⚠️  نکات منفی:")
+        for c in result.cons:
+            print(f"   - {c}")
+    print("═" * 62)
 
 
 if __name__ == "__main__":

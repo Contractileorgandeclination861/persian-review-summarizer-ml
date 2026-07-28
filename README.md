@@ -2,48 +2,52 @@
 
 # Persian Review Summarizer
 
-**An offline, local NLP toolkit that condenses a batch of Persian product reviews into a short summary and a sentiment breakdown — using both classical Machine Learning (TextRank) and Deep Learning (mT5). No cloud, no external API.**
+**Turn a pile of Persian reviews into a clear verdict.** Give it the reviews for a product (or anything else) and it returns a short summary, an estimated star rating, a sentiment breakdown, the most-mentioned keywords, and a pros/cons list — all computed on your own machine.
 
-خلاصه‌سازی محلی و آفلاین نظرات فارسی با دو رویکرد یادگیری ماشین و یادگیری عمیق — بدون هیچ سرویس ابری.
+ابزاری برای جمع‌بندی نظرات فارسی: خلاصه، امتیاز ستاره‌ای، تحلیل احساسات، کلیدواژه‌ها و نکات مثبت/منفی — همه به‌صورت محلی.
 
 [![CI](https://github.com/mehdikhodakarami/persian-review-summarizer-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/mehdikhodakarami/persian-review-summarizer-ml/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![Offline](https://img.shields.io/badge/100%25-offline-success)
 ![scikit-learn](https://img.shields.io/badge/scikit--learn-TextRank-F7931E?logo=scikitlearn&logoColor=white)
 ![Transformers](https://img.shields.io/badge/🤗_Transformers-mT5-FFD21E)
+![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?logo=streamlit&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
 </div>
 
 ---
 
-## Overview
+## What it does
 
-Persian Review Summarizer takes a set of user reviews (about a product, service, or anything else) and produces:
+Feed it a set of reviews and it produces a compact report:
 
-1. **A concise summary** — the essence of what everyone is saying, in a few sentences.
-2. **A sentiment breakdown** — how many reviews are positive, negative, or neutral.
+- **📝 Summary** — the gist of what everyone is saying, in a few sentences.
+- **⭐ Estimated rating** — a 1–5 star score derived from the overall sentiment.
+- **📊 Sentiment breakdown** — how many reviews are positive, negative, or neutral.
+- **🏷️ Keywords** — the terms people mention most (extracted with TF-IDF).
+- **✅⚠️ Pros & Cons** — the standout positive and negative points, pulled sentence by sentence.
 
-It ships with **two interchangeable summarization engines** behind a single interface, so you can trade off speed vs. fluency by changing one setting:
+Two summarization engines sit behind one interface, so you pick the trade-off you want by changing a single setting:
 
-| Engine | Technique | Paradigm | Model download |
-|--------|-----------|----------|----------------|
-| **Extractive** (`extractive`) | TextRank — TF-IDF sentence vectors ranked with the PageRank algorithm over a cosine-similarity graph | Unsupervised **Machine Learning** | None — runs instantly |
-| **Abstractive** (`abstractive`) | `mT5` sequence-to-sequence transformer with a map-reduce strategy for many reviews | **Deep Learning** | ~2.2 GB on first run, then fully offline |
+| Engine | Technique | Approach | First run |
+|--------|-----------|----------|-----------|
+| **Extractive** (`extractive`) | TextRank — TF-IDF sentence vectors ranked with PageRank over a similarity graph | Unsupervised **Machine Learning** | Ready instantly, no model needed |
+| **Abstractive** (`abstractive`) | `mT5` sequence-to-sequence transformer with a map-reduce pipeline | **Deep Learning** | Downloads the model once (~2.2 GB), then works offline |
 
-Everything runs locally. The extractive path needs no model at all; the abstractive path downloads the transformer once and then works with no network.
+Everything runs on-device — the extractive engine needs no download at all, and the abstractive engine only reaches the network once to fetch the transformer.
 
 ---
 
 ## Features
 
-- 🧹 **Robust Persian preprocessing** — Unicode normalization, Arabic→Persian character mapping, digit normalization, emoji/URL/diacritic removal, sentence segmentation (via `hazm`, with a pure-regex fallback so it never hard-fails).
-- 🔹 **Extractive summarization (ML)** — a from-scratch TextRank implementation (TF-IDF + cosine similarity + PageRank) with Persian stop-word filtering.
-- 🧠 **Abstractive summarization (DL)** — `mT5` transformer with lazy loading and a map-reduce pipeline that scales to large review sets.
-- 📊 **Negation-aware sentiment** — a Persian lexicon that correctly flips constructs like *«خوب نبود»* (“wasn’t good”) to negative.
+- 🧹 **Solid Persian preprocessing** — Unicode normalization, Arabic→Persian character mapping, digit normalization, emoji/URL/diacritic removal, and sentence segmentation (via `hazm`, with a regex fallback so it always keeps working).
+- 🔹 **Extractive summarization (ML)** — a from-scratch TextRank (TF-IDF + cosine similarity + PageRank) with Persian stop-word filtering.
+- 🧠 **Abstractive summarization (DL)** — an `mT5` transformer with lazy loading and a map-reduce pipeline that scales to large review sets.
+- 📊 **Negation-aware sentiment** — a Persian lexicon that correctly reads constructs like *«خوب نبود»* (“wasn’t good”) as negative.
+- ⭐ **Rating, keywords, and pros/cons** — extra insights layered on top of the summary.
 - 🧩 **Clean architecture** — decoupled layers (preprocessing → summarizer → analyzer → interface) using the Strategy + Factory patterns and dependency injection.
-- 🖥️ **Two interfaces** — a Streamlit web UI and a CLI. Also usable as a Python library.
-- ✅ **Tested** — 19 unit tests that run without any model download.
+- 🖥️ **Three ways to use it** — a Streamlit web app, a CLI, or import it as a Python library.
+- ✅ **Tested & CI-checked** — 24 unit tests that run without any model download, on every push.
 
 ---
 
@@ -51,15 +55,15 @@ Everything runs locally. The extractive path needs no model at all; the abstract
 
 ```mermaid
 flowchart TD
-    R["User reviews"] --> P["Persian preprocessing<br/>(hazm + regex fallback)"]
+    R["User reviews"] --> P["Persian preprocessing"]
     P --> A["ReviewAnalyzer"]
     A --> M{"METHOD"}
-    M -->|extractive| E["TextRank<br/>TF-IDF + PageRank<br/>(Machine Learning)"]
-    M -->|abstractive| D["mT5 transformer<br/>(Deep Learning)"]
-    A --> S["Negation-aware<br/>sentiment"]
-    E --> OUT["Short summary + sentiment breakdown"]
+    M -->|extractive| E["TextRank<br/>TF-IDF + PageRank"]
+    M -->|abstractive| D["mT5 transformer"]
+    A --> I["Insights:<br/>sentiment · rating<br/>keywords · pros/cons"]
+    E --> OUT["Report"]
     D --> OUT
-    S --> OUT
+    I --> OUT
 ```
 
 ---
@@ -75,11 +79,12 @@ review-summarizer/
 │   ├── extractive.py     # TextRank engine (ML)
 │   ├── abstractive.py    # mT5 engine (DL)
 │   ├── sentiment.py      # Negation-aware lexicon sentiment
-│   ├── aggregator.py     # ReviewAnalyzer: summary + sentiment
+│   ├── insights.py       # Keywords, pros/cons, rating
+│   ├── aggregator.py     # ReviewAnalyzer: ties everything together
 │   └── engine.py         # Factory that selects the engine
 ├── app.py                # Streamlit UI
 ├── cli.py                # Command-line interface
-├── tests/                # 19 unit tests
+├── tests/                # 24 unit tests
 └── data/sample_reviews.csv
 ```
 
@@ -114,7 +119,7 @@ python cli.py --reviews "کیفیت عالیه" "قیمت گرونه" "پشتی�
 python cli.py --file data/sample_reviews.csv --method abstractive
 ```
 
-### Web UI
+### Web app
 ```bash
 pip install streamlit
 streamlit run app.py
@@ -124,36 +129,42 @@ streamlit run app.py
 ```python
 from summarizer import ReviewAnalyzer
 
-analyzer = ReviewAnalyzer()               # uses METHOD from .env (default: extractive)
-result = analyzer.analyze([
+analyzer = ReviewAnalyzer()               # engine chosen by METHOD in .env
+report = analyzer.analyze([
     "کیفیت ساخت عالیه ولی قیمتش گرونه.",
     "باتری خوبی داره و یه روز کامل دووم میاره.",
     "پشتیبانی ضعیف بود و دیر جواب دادن.",
 ])
 
-print(result.summary)
-print(result.sentiment.label, result.sentiment.positive, result.sentiment.negative)
+print(report.summary)
+print(report.rating, report.sentiment.label)
+print(report.keywords)
+print(report.pros, report.cons)
 ```
 
 ### Sample output
 ```
-Summary:
+📌 Summary:
    این گوشی دوربین فوق‌العاده‌ای دارد و کیفیت عکس‌ها در نور کم عالی است...
    کیفیت ساخت گوشی واقعا عالیه و بدنه محکمی داره. صفحه‌نمایش خیلی باکیفیته.
-Sentiment: positive=6 | negative=1 | neutral=1  →  mostly positive
+⭐ Rating: ★★★★☆  (4.2 / 5)
+📊 Sentiment: positive=6 | negative=1 | neutral=1  →  mostly positive
+🏷️ Keywords: گوشی، کیفیت، صفحه‌نمایش، دوربین، محصول، زود
+✅ Pros: کیفیت ساخت گوشی واقعا عالیه و بدنه محکمی داره. …
+⚠️ Cons: پشتیبانی فروشگاه اصلا خوب نبود و دیر فرستادن.
 ```
 
 ---
 
 ## Configuration
 
-All settings are read from environment variables (or a `.env` file):
+Settings come from environment variables (or a `.env` file):
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `METHOD` | `extractive` | `extractive` (ML) or `abstractive` (DL) |
-| `SUMMARY_SENTENCES` | `3` | Number of sentences in an extractive summary |
-| `HF_MODEL_NAME` | `csebuetnlp/mT5_multilingual_XLSum` | Transformer used by the abstractive engine |
+| `SUMMARY_SENTENCES` | `3` | Sentences in an extractive summary |
+| `HF_MODEL_NAME` | `csebuetnlp/mT5_multilingual_XLSum` | Transformer for the abstractive engine |
 | `DEVICE` | `cpu` | `cpu` or `cuda` |
 | `MAX_INPUT_LENGTH` / `MAX_OUTPUT_LENGTH` | `1024` / `90` | Token limits for the transformer |
 | `NUM_BEAMS` | `4` | Beam-search width |
@@ -166,17 +177,17 @@ All settings are read from environment variables (or a `.env` file):
 ## Testing
 
 ```bash
-pytest              # 19 tests, no model download required
+pytest              # 24 tests, no model download required
 ```
 
 ---
 
 ## Roadmap
 
-- Aspect-based summarization (group opinions by feature: battery, camera, price, …).
-- Replace the lexicon sentiment with a fine-tuned Persian transformer (e.g. ParsBERT).
-- Sentence-embedding-based extractive ranking as a third engine.
-- REST API and Docker image for server deployment.
+- Aspect-based analysis — group opinions and sentiment by feature (battery, camera, price…).
+- Swap the lexicon sentiment for a fine-tuned Persian transformer (e.g. ParsBERT).
+- A third engine using sentence embeddings for extractive ranking.
+- REST API and a Docker image for server deployment.
 
 ---
 

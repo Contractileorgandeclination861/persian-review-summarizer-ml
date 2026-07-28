@@ -1,18 +1,20 @@
 """
 تحلیلگر نظرات (لایه‌ی سطح‌بالا).
 
-مجموعه‌ای از نظرات را می‌گیرد و یک گزارش کامل برمی‌گرداند:
+مجموعه‌ای از نظرات را می‌گیرد و یک گزارش تحلیلی کامل برمی‌گرداند:
   • خلاصه‌ی کوتاه (با موتور انتخاب‌شده: استخراجی یا تولیدی)
-  • آمار احساسات (مثبت/منفی/خنثی)
+  • آمار احساسات (مثبت/منفی/خنثی) + امتیاز ستاره‌ای تخمینی
+  • کلیدواژه‌های پرتکرار
+  • نکات مثبت و منفی (Pros & Cons)
 
 هم رابط کاربری (Streamlit) و هم خط فرمان از همین کلاس استفاده می‌کنند.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from summarizer import sentiment
+from summarizer import insights, sentiment
 from summarizer.base import BaseSummarizer
 from summarizer.config import Settings, get_settings
 from summarizer.engine import get_summarizer
@@ -28,10 +30,14 @@ class ReviewAnalysis:
     sentiment: SentimentResult
     review_count: int
     method: str
+    rating: float = 0.0
+    keywords: list[str] = field(default_factory=list)
+    pros: list[str] = field(default_factory=list)
+    cons: list[str] = field(default_factory=list)
 
 
 class ReviewAnalyzer:
-    """موتور اصلی تحلیل نظرات فارسی (خلاصه + احساسات)."""
+    """موتور اصلی تحلیل نظرات فارسی (خلاصه + احساسات + بینش)."""
 
     def __init__(
         self,
@@ -40,7 +46,6 @@ class ReviewAnalyzer:
         settings: Settings | None = None,
     ) -> None:
         self._settings = settings or get_settings()
-        # تزریق وابستگی: در تست می‌توان موتور سبک (استخراجی) پاس داد.
         self._summarizer = summarizer or get_summarizer(self._settings)
         self._pre = preprocessor or PersianTextPreprocessor()
 
@@ -67,12 +72,19 @@ class ReviewAnalyzer:
 
         summary = self._summarizer.summarize_reviews(cleaned)
         senti = sentiment.analyze(cleaned)
+        pros, cons = insights.extract_pros_cons(cleaned)
 
         return ReviewAnalysis(
             summary=summary,
             sentiment=senti,
             review_count=len(cleaned),
             method=self.method,
+            rating=insights.estimate_rating(
+                senti.positive, senti.negative, senti.neutral
+            ),
+            keywords=insights.extract_keywords(cleaned),
+            pros=pros,
+            cons=cons,
         )
 
     def summarize_one(self, text: str) -> str:

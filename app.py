@@ -90,12 +90,41 @@ def main() -> None:
 
         st.subheader("📊 تحلیل احساسات")
         s = result.sentiment
+        stars = "★" * round(result.rating) + "☆" * (5 - round(result.rating))
+        st.markdown(f"### {stars}  &nbsp; {result.rating} از ۵")
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("تعداد نظرات", s.total)
         c2.metric("مثبت 😊", s.positive)
         c3.metric("منفی 😞", s.negative)
         c4.metric("خنثی 😐", s.neutral)
         st.info(f"جمع‌بندی احساسات: **{s.label}**")
+
+        if result.keywords:
+            st.subheader("🏷️ کلیدواژه‌ها")
+            st.markdown(
+                " ".join(
+                    f"<span style='background:#eef;padding:4px 10px;border-radius:12px;"
+                    f"margin:2px;display:inline-block'>{k}</span>"
+                    for k in result.keywords
+                ),
+                unsafe_allow_html=True,
+            )
+
+        col_pro, col_con = st.columns(2)
+        with col_pro:
+            st.subheader("✅ نکات مثبت")
+            if result.pros:
+                for p in result.pros:
+                    st.markdown(f"- {p}")
+            else:
+                st.caption("—")
+        with col_con:
+            st.subheader("⚠️ نکات منفی")
+            if result.cons:
+                for c in result.cons:
+                    st.markdown(f"- {c}")
+            else:
+                st.caption("—")
 
 
 if __name__ == "__main__":

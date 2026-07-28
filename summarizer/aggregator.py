@@ -1,0 +1,84 @@
+"""
+تحلیلگر نظرات (لایه‌ی سطح‌بالا).
+
+مجموعه‌ای از نظرات را می‌گیرد و یک گزارش کامل برمی‌گرداند:
+  • خلاصه‌ی کوتاه (با موتور انتخاب‌شده: استخراجی یا تولیدی)
+  • آمار احساسات (مثبت/منفی/خنثی)
+
+هم رابط کاربری (Streamlit) و هم خط فرمان از همین کلاس استفاده می‌کنند.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from summarizer import sentiment
+from summarizer.base import BaseSummarizer
+from summarizer.config import Settings, get_settings
+from summarizer.engine import get_summarizer
+from summarizer.preprocess import PersianTextPreprocessor
+from summarizer.sentiment import SentimentResult
+
+
+@dataclass(frozen=True)
+class ReviewAnalysis:
+    """خروجی کامل تحلیل مجموعه‌ای از نظرات."""
+
+    summary: str
+    sentiment: SentimentResult
+    review_count: int
+    method: str
+
+
+class ReviewAnalyzer:
+    """موتور اصلی تحلیل نظرات فارسی (خلاصه + احساسات)."""
+
+    def __init__(
+        self,
+        summarizer: BaseSummarizer | None = None,
+        preprocessor: PersianTextPreprocessor | None = None,
+        settings: Settings | None = None,
+    ) -> None:
+        self._settings = settings or get_settings()
+        # تزریق وابستگی: در تست می‌توان موتور سبک (استخراجی) پاس داد.
+        self._summarizer = summarizer or get_summarizer(self._settings)
+        self._pre = preprocessor or PersianTextPreprocessor()
+
+    @property
+    def method(self) -> str:
+        return self._summarizer.name
+
+    def analyze(self, reviews: list[str]) -> ReviewAnalysis:
+        """مجموعه‌ای از نظرات را تحلیل کن و گزارش کامل برگردان."""
+        if len(reviews) > self._settings.max_reviews:
+            raise ValueError(
+                f"تعداد نظرات ({len(reviews)}) از حد مجاز "
+                f"({self._settings.max_reviews}) بیشتر است."
+            )
+
+        cleaned = [c for c in self._pre.clean_many(reviews) if c]
+        if not cleaned:
+            return ReviewAnalysis(
+                summary="",
+                sentiment=SentimentResult(0, 0, 0, 0),
+                review_count=0,
+                method=self.method,
+            )
+
+        summary = self._summarizer.summarize_reviews(cleaned)
+        senti = sentiment.analyze(cleaned)
+
+        return ReviewAnalysis(
+            summary=summary,
+            sentiment=senti,
+            review_count=len(cleaned),
+            method=self.method,
+        )
+
+    def summarize_one(self, text: str) -> str:
+        """خلاصه‌ی یک متن تکی."""
+        cleaned = self._pre.clean(text)
+        return self._summarizer.summarize(cleaned) if cleaned else ""
+
+
+__all__ = ["ReviewAnalyzer", "ReviewAnalysis"]

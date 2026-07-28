@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# محیط و اسرار
+.env
+
+# تست
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# خروجی‌ها
+*.log
+out.csv
+
+# کش مدل‌های HuggingFace
+.cache/
+models/
+
+# سیستم
+.DS_Store
+.idea/
+.vscode/

